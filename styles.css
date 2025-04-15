@@ -171,6 +171,9 @@ nav .nav-links {
     color: var(--text-color);
     font-weight: 700;
     font-family: "Special Gothic Expanded One", sans-serif;
+    position: relative;
+    left: 50px;
+
 }
 
 .logo {
