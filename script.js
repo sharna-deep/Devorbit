@@ -365,7 +365,7 @@ if (heroImage && personImg) {
 const contactForm = document.getElementById('contactForm');
 
 // Initialize EmailJS
-emailjs.init("Ex4ZaRdUZiQQ13tRK"); // You'll need to replace this with your actual EmailJS public key
+emailjs.init("f2-6Wb2auHnzX3_Ps"); // You'll need to replace this with your actual EmailJS public key
 
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
