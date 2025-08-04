@@ -361,58 +361,120 @@ if (heroImage && personImg) {
     animate();
 }
 
-// Contact Form
-const contactForm = document.getElementById('contactForm');
-
-// Initialize EmailJS with the newer version
-emailjs.init("QFt1mubcoWjM1OIDz");
-
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form values
-        const email = document.getElementById('email').value;
-        const title = document.getElementById('title').value;
-        const message = document.getElementById('message').value;
-        
-        // Show loading state
-        const submitButton = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitButton.textContent;
-        submitButton.textContent = 'Sending...';
-        submitButton.disabled = true;
-        
-        // Format the message to include sender's email and title
-        const formattedMessage = `
-From: ${email}
-Title: ${title}
-
-Message:
-${message}
-`;
-        
-        // Send email using the newer EmailJS syntax
-        emailjs.send("service_bkutsuh", "template_a2vyv7f", {
-            to_email: "devorbit45@gmail.com",
-            from_email: email,
-            subject: title,
-            message: formattedMessage
-        })
-        .then(function(response) {
-            console.log('SUCCESS!', response.status, response.text);
-            showSuccessModal();
-            contactForm.reset();
-        }, function(error) {
-            console.error('FAILED...', error);
-            alert('Failed to send message. Please try again later.');
-        })
-        .finally(function() {
-            // Reset button state
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
+// Contact Form - Enhanced EmailJS Implementation
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    
+    // Initialize EmailJS with proper error handling
+    function initializeEmailJS() {
+        try {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init("QFt1mubcoWjM1OIDz");
+                console.log('EmailJS initialized successfully');
+                return true;
+            } else {
+                console.error('EmailJS not loaded');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error initializing EmailJS:', error);
+            return false;
+        }
+    }
+    
+    // Initialize EmailJS when the page loads
+    let emailjsInitialized = false;
+    
+    // Try to initialize immediately
+    emailjsInitialized = initializeEmailJS();
+    
+    // If not initialized, wait for EmailJS to load
+    if (!emailjsInitialized) {
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                emailjsInitialized = initializeEmailJS();
+            }, 1000);
         });
-    });
-}
+    }
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Check if EmailJS is initialized
+            if (!emailjsInitialized) {
+                alert('Email service is not ready. Please refresh the page and try again.');
+                return;
+            }
+            
+            // Get form values
+            const email = document.getElementById('email').value;
+            const title = document.getElementById('title').value;
+            const message = document.getElementById('message').value;
+            
+            // Validate form
+            if (!email || !title || !message) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+            
+            // Prepare template parameters - try different variable names
+            const templateParams = {
+                // Try multiple possible variable names
+                to_email: "devorbit45@gmail.com",
+                from_email: email,
+                subject: title,
+                message: message,
+                user_email: email,
+                user_name: email.split('@')[0], // Extract name from email
+                user_message: message,
+                user_subject: title,
+                // Alternative variable names
+                email: email,
+                name: email.split('@')[0],
+                msg: message,
+                subj: title
+            };
+            
+            console.log('Sending email with params:', templateParams);
+            
+            // Send email with multiple fallback attempts
+            emailjs.send("service_bkutsuh", "template_a2vyv7f", templateParams)
+            .then(function(response) {
+                console.log('SUCCESS!', response.status, response.text);
+                showSuccessModal();
+                contactForm.reset();
+            }, function(error) {
+                console.error('FAILED...', error);
+                console.error('Error details:', {
+                    status: error.status,
+                    text: error.text,
+                    response: error.response
+                });
+                
+                // Try alternative service/template if available
+                if (error.status === 400) {
+                    alert('Invalid template or service configuration. Please check your EmailJS setup.');
+                } else if (error.status === 429) {
+                    alert('Too many requests. Please try again later.');
+                } else {
+                    alert('Failed to send message. Please try again later. Error: ' + error.text);
+                }
+            })
+            .finally(function() {
+                // Reset button state
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            });
+        });
+    }
+});
 
 function showSuccessModal() {
     let modal = document.getElementById('successModal');
@@ -439,3 +501,38 @@ function closeSuccessModal() {
         modal.style.display = 'none';
     }
 }
+
+// Debug function to test EmailJS configuration
+window.testEmailJS = function() {
+    console.log('🧪 Testing EmailJS configuration...');
+    console.log('EmailJS object:', typeof emailjs);
+    console.log('Public Key:', "QFt1mubcoWjM1OIDz");
+    console.log('Service ID:', "service_bkutsuh");
+    console.log('Template ID:', "template_a2vyv7f");
+    
+    // Test initialization
+    try {
+        emailjs.init("QFt1mubcoWjM1OIDz");
+        console.log('✅ EmailJS initialized successfully');
+        
+        // Test sending a simple email
+        emailjs.send("service_bkutsuh", "template_a2vyv7f", {
+            to_email: "devorbit45@gmail.com",
+            from_email: "test@example.com",
+            subject: "Test Email",
+            message: "This is a test email from EmailJS"
+        })
+        .then(function(response) {
+            console.log('✅ Test email sent successfully:', response);
+        }, function(error) {
+            console.error('❌ Test email failed:', error);
+            console.error('Error details:', {
+                status: error.status,
+                text: error.text,
+                response: error.response
+            });
+        });
+    } catch (error) {
+        console.error('❌ EmailJS initialization failed:', error);
+    }
+};

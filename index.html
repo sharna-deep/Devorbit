@@ -188,12 +188,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
-        // Ensure EmailJS is loaded before initializing
+        // Enhanced EmailJS loading check
         window.addEventListener('load', function() {
             if (typeof emailjs !== 'undefined') {
-                console.log('EmailJS loaded successfully');
+                console.log('✅ EmailJS loaded successfully');
+                console.log('EmailJS version:', emailjs.version);
             } else {
-                console.error('EmailJS failed to load');
+                console.error('❌ EmailJS failed to load');
             }
         });
     </script>
