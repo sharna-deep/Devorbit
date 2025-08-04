@@ -365,7 +365,7 @@ if (heroImage && personImg) {
 const contactForm = document.getElementById('contactForm');
 
 // Initialize EmailJS
-emailjs.init("f2-6Wb2auHnzX3_Ps"); // You'll need to replace this with your actual EmailJS public key
+emailjs.init("QFt1mubcoWjM1OIDz"); // You'll need to replace this with your actual EmailJS public key
 
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
@@ -386,8 +386,8 @@ ${message}
 `;
         
         // Send email
-        emailjs.send("service_ezkfokh", "template_3u645vj", {
-            to_email: "sharnadeep2812@gmail.com",
+        emailjs.send("service_bkutsuh", "template_a2vyv7f", {
+            to_email: "devorbit45@gmail.com",
             from_email: email,
             subject: title,
             message: formattedMessage
