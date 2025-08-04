@@ -364,8 +364,8 @@ if (heroImage && personImg) {
 // Contact Form
 const contactForm = document.getElementById('contactForm');
 
-// Initialize EmailJS
-emailjs.init("QFt1mubcoWjM1OIDz"); // You'll need to replace this with your actual EmailJS public key
+// Initialize EmailJS with the newer version
+emailjs.init("QFt1mubcoWjM1OIDz");
 
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
@@ -376,6 +376,12 @@ if (contactForm) {
         const title = document.getElementById('title').value;
         const message = document.getElementById('message').value;
         
+        // Show loading state
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Sending...';
+        submitButton.disabled = true;
+        
         // Format the message to include sender's email and title
         const formattedMessage = `
 From: ${email}
@@ -385,7 +391,7 @@ Message:
 ${message}
 `;
         
-        // Send email
+        // Send email using the newer EmailJS syntax
         emailjs.send("service_bkutsuh", "template_a2vyv7f", {
             to_email: "devorbit45@gmail.com",
             from_email: email,
@@ -393,11 +399,17 @@ ${message}
             message: formattedMessage
         })
         .then(function(response) {
+            console.log('SUCCESS!', response.status, response.text);
             showSuccessModal();
             contactForm.reset();
         }, function(error) {
+            console.error('FAILED...', error);
             alert('Failed to send message. Please try again later.');
-            console.error('Error:', error);
+        })
+        .finally(function() {
+            // Reset button state
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
         });
     });
 }
